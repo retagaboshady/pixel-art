@@ -3,20 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pixel Art</title>
+    <title>Pro Pixel Art Studio</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <div class="toolbar">
-        <input type="color" id="colorPicker" value="#ff0000">
-        <button id="clearBtn">Clear Canvas</button>
-        <button id="exportBtn">Export JSON</button>
-        <button id="importBtn">Import JSON</button>
-        <input type="file" id="fileInput" accept=".json" style="display: none;">
+<body class="dark-theme">
+    <div class="app-container">
+            <div class="sidebar">
+                <h2>Tools</h2>
+                <div class="tool-group">
+                    <input type="color" id="colorPicker" value="#e74c3c">
+                    <span class="tool-label">Active Color</span>
+                </div>
+                <div class="button-gird">
+                    <button id="drawTool" class="active">Draw</button>
+                    <button id="eraseTool">Erase</button>
+                    <button id="fillTool">Bucket</button>
+                    <button id="pickerTool">Dropper</button>
+                </div>
+                <hr>
+                <h2>Canvas</h2>
+                <div class="select-group">
+                    <label for="sizeSelect">Grid Size:</label>
+                    <select id="sizeSelect">
+                        <option value="16">16 * 16</option>
+                        <option value="32" selected>32 * 32</option>
+                        <option value="64">64 * 64</option>
+                    </select>
+                </div>
+                <button id="toggleGrid"> Togglr Gridd</button>
+                <button id="clear-btn" class="danger">Clear Canvas</button>
+                <hr>
+                <h2>History</h2>
+                <div class="button-grid">
+                    <button id="undoBtn"> Undo</button>
+                    <button id="redoBtn"> Redo</button>
+                </div>
+                <hr>
+                <h2>File Storage</h2>
+                <button id="exportPngBtn" class="success">Export ad PNG</button>
+                <button id="exportJsonBtn">Save JSON</button>
+                <button id="importJsonBtn">Load JSON</button>
+                <input type="file" id="fileInput" accept=".json" style="display: none;">
+                <hr>
+                <button id="rhemeToggle">Toggle Theme</button>
     </div>
-    <div class="grid-container">
-        <div id="pixelGrid" class="grid"></div>
-    </div>
+    <div class></div>
     <script src="js/script.js"></script>
+    </div>
 </body>
 </html>
