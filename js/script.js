@@ -1,4 +1,4 @@
-const gird = document.getElementById('pixelGird');
+const grid = document.getElementById('pixelGrid');
 const colorPicker = document.getElementById('colorPicker');
 const clearBtn = document.getElementById('clearBtn');
 const exportBtn = document.getElementById('exportBtn');
@@ -8,15 +8,20 @@ const fileInput = document.getElementById('fileInput');
 const GRID_SIZE = 16;
 let isDrawing = false;
 
-function creatGird() {
-    gird.innerHTML = '';
-    for (let i = 0; i < GIRD_SIZE * GIRD_SIZE; i++) {
+function createGrid() {
+    grid.innerHTML = '';
+    for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
         const pixel = document.createElement('div');
         pixel.classList.add('pixel');
+        pixel.addEventListener('dragstart', (e) => e.preventDefault());
+        pixel.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            colorPixel(e.target);
+        });
         pixel.addEventListener('mouseenter', (e) => {
             if (isDrawing) colorPixel(e.target);
         });
-        gird.appendChild(pixel);
+        grid.appendChild(pixel);
     }
 }
 
@@ -39,7 +44,7 @@ exportBtn.addEventListener('click', () => {
         colorArray.push(color);
     });
     const jsonOutput = {
-        girdSize: GIRD_SIZE,
+        gridSize: GRID_SIZE,
         pixels: colorArray
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonOutput, null, 2));
@@ -52,3 +57,27 @@ exportBtn.addEventListener('click', () => {
 });
 
 importBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.pixels && data.pixels.length === GRID_SIZE * GRID_SIZE) {
+                const pixels = document.querySelectorAll('.pixel');
+                pixels.forEach((pixel, index) => {
+                    pixel.style.backgroundColor = data.pixels[index];
+                });
+            } else {
+                alert("Invaild JSON file")
+            }
+        } catch (error) {
+            alert("Error reaing JSON file");
+        }
+    };
+    reader.readAsText(file);
+});
+
+createGrid();
