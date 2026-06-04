@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pixel Art</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="toolbar">
+        <input type="color" id="colorPicker" value="#ff0000">
+        <button id="clearBtn">Clear Canvas</button>
+        <button id="exportBtn">Export JSON</button>
+        <button id="importBtn">Import JSON</button>
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+    </div>
+    <div class="gird-container">
+        <div id="pixelGird" class="gird"></div>
+    </div>
+    <script scr="js/script.js"></script>
+</body>
+</html>
