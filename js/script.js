@@ -81,5 +81,26 @@ function runPaintaBaucket(allPixels, startIndex, targetColor, replacementColor) 
         const row = Math.floor(current / currentGridSize);
         const col = current % currentGridSize;
         if (col > 0) checkNeighbor(current -1);
+        if (col < currentGridSize - 1) checkNeighbor(current +1);
+        if (row > 0) checkNeighbor(current - currentGridSize);
+        if (row < currentGridSize - 1) checkNeighbor(current + currentGridSize);
     }
+    function checkNeighbor(index) {
+        const pixColor = allPixels[index].style.backgroundColor || 'rgb(255, 255, 255';
+        if (pixColor === targetColor) {
+            pixelQueue.push(index);
+        }
+    }
+}
+
+function setActiveTool(toolName) {
+    currentTool = toolName;
+    drawTool.classList.remove('active');
+    eraseTool.classList.remove('active');
+    fillTool.classList.remove('active');
+    pickerTool.classList.remove('active');
+    if (toolName === 'draw') drawTool.classList.add('active');
+    if (toolName === 'erase') eraseTool.classList.add('active');
+    if (toolName === 'fill') fillTool.classList.add('active');
+    if (toolName === 'picker') pickerTool.classList.add('active');
 }
