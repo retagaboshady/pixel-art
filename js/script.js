@@ -104,3 +104,22 @@ function setActiveTool(toolName) {
     if (toolName === 'fill') fillTool.classList.add('active');
     if (toolName === 'picker') pickerTool.classList.add('active');
 }
+function saveHistoryState() {
+    const pixels = document.querySelectorAll('.pixel');
+    const colorState = Array.from(pixels).map(p => p.style.backgroundColor || '#ffffff');
+    undoStack.push(colorState);
+    redoStack = [];
+}
+
+undoBtn.addEventListener('click', () => {
+    if (undoStack.length === 0) return; // Nothing left to undo
+    
+    const pixels = document.querySelectorAll('.pixel');
+    const currentState = Array.from(pixels).map(p => p.style.backgroundColor || '#ffffff');
+    redoStack.push(currentState);
+
+    const previousState = undoStack.pop();
+    pixels.forEach((pixel, i) => pixel.style.backgroundColor = previousState[i]);
+});
+
+redoBtn.addEventListener
