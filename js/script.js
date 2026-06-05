@@ -1,83 +1,85 @@
 const grid = document.getElementById('pixelGrid');
 const colorPicker = document.getElementById('colorPicker');
-const clearBtn = document.getElementById('clearBtn');
-const exportBtn = document.getElementById('exportBtn');
-const importBtn = document.getElementById('importBtn');
+const sizeSelector = document.getElementById('sizeSelector');
+const togglegridBtn = document.getElementById('toggleGrid');
+const clearBtn = document.getElementById('clearbtn');
+const drawTool = document.getElementById('drawtool');
+const eraseTool = document.getElementById('eraseTool');
+const fillTool = document.getElementById('fillTool');
+const pickerTool = document.getElementById('pickerTool');
+const exportPngBtn = document.getElementById('exportPngBtn');
+const exportJsonBtn = document.getElementById('exportJsonBtn');
+const importJsonBtn = document.getElementById('importJsonBtn');
 const fileInput = document.getElementById('fileInput');
+const undoBtn = document.getElementById('undoBtn');
+const redoBtn = document.getElementById('redoBtn');
 
-const GRID_SIZE = 16;
+let currentGridSize = 32;
+let currentTool = 'draw';
 let isDrawing = false;
+let undoStack = [];
+let redoStack = [];
 
-function createGrid() {
+function creatGrid() {
     grid.innerHTML = '';
-    for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+    grid.style.gridTamplateColumns = `repeat(${currentGridSize}, ${Math.floor(550 / currentGridSize)}px)`;
+    grid.style.gridTemplateRows = `repeat(${currentGridSize}, ${Math.floor(550 / currentGridSize)}px)`;
+    for (let i = 0; i < currentGridSize * currentGridSize; i++) {
         const pixel = document.createElement('div');
         pixel.classList.add('pixel');
+        pixel.style.backgroundColor = '#ffffff';
+        pixel.dataset.index = i;
         pixel.addEventListener('dragstart', (e) => e.preventDefault());
         pixel.addEventListener('mousedown', (e) => {
             isDrawing = true;
-            colorPixel(e.target);
+            saveHistoryState();
+            useActiveTool(e.target);
         });
         pixel.addEventListener('mouseenter', (e) => {
-            if (isDrawing) colorPixel(e.target);
+            if (isDrawing && (currentTool === 'draw' || currentTool === 'erase')) {
+            }
         });
         grid.appendChild(pixel);
     }
 }
 
-window.addEventListener('mouseup', () => isDrawing = false);
-
-function colorPixel(pixel) {
-    pixel.style.backgroundColor = colorPicker.value;
+function useActivetool(pixel) {
+    const activeColor = colorPicker.ariaValueMax;
+    if (currentTool === 'draw') {
+        pixel.style.backgroundColor = activeColor;
+    }
+    else if (currentTool === 'erase') {
+        pixel.style.backgroundColor = '#ffffff';
+    }
+    else if (currentTool === 'picker') {
+        const pixelColor = pixel.style.background;
+        colorPicker.value = convertrgbToHex(pixelColor);
+        setActiveTool('draw');
+    }
+    else if (currentTool === 'fill') {
+        const allPixels = Array.from(document.querySelectorAll('.pixel'));
+        const targrtIndex = parseInt(pixel.dataset.index);
+        const startingColor = pixel.style.backgroundColor || 'rgb(255, 255, 255';
+        runPaintbucket(allPixels, targetIndex, startingColor, convertHexTorgb(activeColor));
+    }
 }
 
-clearBtn.addEventListener('click', () => {
-    const pixels = document.querySelectorAll('.pixel');
-    pixels.forEach(pixel => pixel.style.backgroundColor = '#ffffff')
-});
 
-exportBtn.addEventListener('click', () => {
-    const pixels = document.querySelectorAll('.pixel');
-    const colorArray = [];
-    pixels.forEach(pixel => {
-        const color = pixel.style.backgroundColor || 'rgba(255, 255,255)';
-        colorArray.push(color);
-    });
-    const jsonOutput = {
-        gridSize: GRID_SIZE,
-        pixels: colorArray
-    };
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonOutput, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "pixel-art.json");
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-});
-
-importBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.pixels && data.pixels.length === GRID_SIZE * GRID_SIZE) {
-                const pixels = document.querySelectorAll('.pixel');
-                pixels.forEach((pixel, index) => {
-                    pixel.style.backgroundColor = data.pixels[index];
-                });
-            } else {
-                alert("Invaild JSON file")
-            }
-        } catch (error) {
-            alert("Error reaing JSON file");
-        }
-    };
-    reader.readAsText(file);
-});
-
-createGrid();
+function runPaintaBaucket(allPixels, startIndex, targetColor, replacementColor) {
+    if (targetColor === replacementColor) return;
+    if (allPixels[startindex].style.backgroundColor !== targetColor &&
+    !(targetColor === 'rgb(255, 255, 255)' && !allPixels[startIndex].style.backgroundColor)) {
+        return;
+    }
+    const pixelQueue = [startIndex];
+    const scannedSet = new Set();
+    while (pixelQueue.length > 0) {
+        const current = pixelQueue.shift();
+        if (scannedSet.has(current)) continue;
+        scannedSet.add(current);
+        allPixels[current].style.backgroundColor = colorPicker.value;
+        const row = Math.floor(current / currentGridSize);
+        const col = current % currentGridSize;
+        if (col > 0) checkNeighbor(current -1);
+    }
+}
