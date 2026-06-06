@@ -2,8 +2,8 @@ const grid = document.getElementById('pixelGrid');
 const colorPicker = document.getElementById('colorPicker');
 const sizeSelector = document.getElementById('sizeSelector');
 const togglegridBtn = document.getElementById('toggleGrid');
-const clearBtn = document.getElementById('clearbtn');
-const drawTool = document.getElementById('drawtool');
+const clearBtn = document.getElementById('clearBtn');
+const drawTool = document.getElementById('drawTool');   
 const eraseTool = document.getElementById('eraseTool');
 const fillTool = document.getElementById('fillTool');
 const pickerTool = document.getElementById('pickerTool');
@@ -20,31 +20,37 @@ let isDrawing = false;
 let undoStack = [];
 let redoStack = [];
 
-function creatGrid() {
+function createGrid() {
     grid.innerHTML = '';
-    grid.style.gridTamplateColumns = `repeat(${currentGridSize}, ${Math.floor(550 / currentGridSize)}px)`;
+    grid.style.gridTemplateColumns = `repeat(${currentGridSize}, ${Math.floor(550 / currentGridSize)}px)`;
     grid.style.gridTemplateRows = `repeat(${currentGridSize}, ${Math.floor(550 / currentGridSize)}px)`;
+    
     for (let i = 0; i < currentGridSize * currentGridSize; i++) {
         const pixel = document.createElement('div');
         pixel.classList.add('pixel');
         pixel.style.backgroundColor = '#ffffff';
         pixel.dataset.index = i;
+        
         pixel.addEventListener('dragstart', (e) => e.preventDefault());
+        
         pixel.addEventListener('mousedown', (e) => {
             isDrawing = true;
             saveHistoryState();
             useActiveTool(e.target);
         });
+        
         pixel.addEventListener('mouseenter', (e) => {
             if (isDrawing && (currentTool === 'draw' || currentTool === 'erase')) {
+                useActiveTool(e.target);
             }
         });
         grid.appendChild(pixel);
     }
 }
 
-function useActivetool(pixel) {
-    const activeColor = colorPicker.ariaValueMax;
+function useActiveTool(pixel) {
+    const activeColor = colorPicker.value;
+    
     if (currentTool === 'draw') {
         pixel.style.backgroundColor = activeColor;
     }
@@ -52,41 +58,46 @@ function useActivetool(pixel) {
         pixel.style.backgroundColor = '#ffffff';
     }
     else if (currentTool === 'picker') {
-        const pixelColor = pixel.style.background;
-        colorPicker.value = convertrgbToHex(pixelColor);
+        const pixelColor = pixel.style.backgroundColor;
+        colorPicker.value = convertRgbToHex(pixelColor);
         setActiveTool('draw');
     }
     else if (currentTool === 'fill') {
         const allPixels = Array.from(document.querySelectorAll('.pixel'));
-        const targrtIndex = parseInt(pixel.dataset.index);
-        const startingColor = pixel.style.backgroundColor || 'rgb(255, 255, 255';
-        runPaintbucket(allPixels, targetIndex, startingColor, convertHexTorgb(activeColor));
+        const targetIndex = parseInt(pixel.dataset.index);
+        const startingColor = pixel.style.backgroundColor || 'rgb(255, 255, 255)';
+        runPaintBucket(allPixels, targetIndex, startingColor, convertHexToRgb(activeColor));
     }
 }
 
-
-function runPaintaBaucket(allPixels, startIndex, targetColor, replacementColor) {
+function runPaintBucket(allPixels, startIndex, targetColor, replacementColor) {
     if (targetColor === replacementColor) return;
-    if (allPixels[startindex].style.backgroundColor !== targetColor &&
+    if (allPixels[startIndex].style.backgroundColor !== targetColor &&
     !(targetColor === 'rgb(255, 255, 255)' && !allPixels[startIndex].style.backgroundColor)) {
         return;
     }
+    
     const pixelQueue = [startIndex];
     const scannedSet = new Set();
+    
     while (pixelQueue.length > 0) {
         const current = pixelQueue.shift();
         if (scannedSet.has(current)) continue;
         scannedSet.add(current);
+        
         allPixels[current].style.backgroundColor = colorPicker.value;
+        
         const row = Math.floor(current / currentGridSize);
         const col = current % currentGridSize;
-        if (col > 0) checkNeighbor(current -1);
-        if (col < currentGridSize - 1) checkNeighbor(current +1);
+        
+        if (col > 0) checkNeighbor(current - 1);
+        if (col < currentGridSize - 1) checkNeighbor(current + 1);
         if (row > 0) checkNeighbor(current - currentGridSize);
         if (row < currentGridSize - 1) checkNeighbor(current + currentGridSize);
     }
+    
     function checkNeighbor(index) {
-        const pixColor = allPixels[index].style.backgroundColor || 'rgb(255, 255, 255';
+        const pixColor = allPixels[index].style.backgroundColor || 'rgb(255, 255, 255)';
         if (pixColor === targetColor) {
             pixelQueue.push(index);
         }
@@ -104,6 +115,12 @@ function setActiveTool(toolName) {
     if (toolName === 'fill') fillTool.classList.add('active');
     if (toolName === 'picker') pickerTool.classList.add('active');
 }
+
+drawTool.addEventListener('click', () => setActiveTool('draw'));
+eraseTool.addEventListener('click', () => setActiveTool('erase'));
+fillTool.addEventListener('click', () => setActiveTool('fill'));
+pickerTool.addEventListener('click', () => setActiveTool('picker'));
+
 function saveHistoryState() {
     const pixels = document.querySelectorAll('.pixel');
     const colorState = Array.from(pixels).map(p => p.style.backgroundColor || '#ffffff');
@@ -112,12 +129,10 @@ function saveHistoryState() {
 }
 
 undoBtn.addEventListener('click', () => {
-    if (undoStack.length === 0) return; // Nothing left to undo
-    
+    if (undoStack.length === 0) return;
     const pixels = document.querySelectorAll('.pixel');
     const currentState = Array.from(pixels).map(p => p.style.backgroundColor || '#ffffff');
     redoStack.push(currentState);
-
     const previousState = undoStack.pop();
     pixels.forEach((pixel, i) => pixel.style.backgroundColor = previousState[i]);
 });
@@ -138,10 +153,10 @@ clearBtn.addEventListener('click', () => {
     document.querySelectorAll('.pixel').forEach(p => p.style.backgroundColor = '#ffffff');
 });
 
-sizeSelector.addEvenetListener('change', (e) => {
-    currentgridSize = parseInt(e.target.value);
+sizeSelector.addEventListener('change', (e) => {
+    currentGridSize = parseInt(e.target.value);
     undoStack = [];
-    redostack = [];
+    redoStack = [];
     createGrid();
 });
 
@@ -163,8 +178,8 @@ exportJsonBtn.addEventListener('click', () => {
     dlAnchor.click();
 });
 
-importJsonBtn.addEvenetListener('click', () => fileInput.click());
-fileInput.addEvenetListener('change', (e) => {
+importJsonBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -176,29 +191,31 @@ fileInput.addEvenetListener('change', (e) => {
             createGrid();
             const pixels = document.querySelectorAll('.pixel');
             pixels.forEach((pixel, i) => {
-                if (data.pixels[i] pixel.style.backgroundColor = data.pixels[i];
+                if (data.pixels[i]) pixel.style.backgroundColor = data.pixels[i];
             });
         } catch (err) {
-            alert("Ooops! Something went wrong Try checking your file");
+            alert("Oops! Something went wrong. Try checking your file.");
         }
     };
-    reader.reader.readAsText(file);
+    reader.readAsText(file);
 });
 
 exportPngBtn.addEventListener('click', () => {
     const hiddenCanvas = document.createElement('canvas');
-
     const drawingContext = hiddenCanvas.getContext('2d');
     const crispScaleMultiplier = 16;
+    
     hiddenCanvas.width = currentGridSize * crispScaleMultiplier;
     hiddenCanvas.height = currentGridSize * crispScaleMultiplier;
+    
     const pixels = document.querySelectorAll('.pixel');
     pixels.forEach((pixel, index) => {
-        const coordinatex = (index % currentGridSize) * crispScaleMultiplier;
+        const coordinateX = (index % currentGridSize) * crispScaleMultiplier;
         const coordinateY = Math.floor(index / currentGridSize) * crispScaleMultiplier;
         drawingContext.fillStyle = pixel.style.backgroundColor || '#ffffff';
-        drawingContext.fillReact(coordinatex, coordinateY, crispScaleMultiplier, crispScaleMultiplier);
+        drawingContext.fillRect(coordinateX, coordinateY, crispScaleMultiplier, crispScaleMultiplier);
     });
+    
     const triggerDownload = document.createElement('a');
     triggerDownload.download = 'my-pixel-masterpiece.png';
     triggerDownload.href = hiddenCanvas.toDataURL('image/png');
@@ -206,5 +223,20 @@ exportPngBtn.addEventListener('click', () => {
 });
 
 function convertHexToRgb(hex) {
-    const r = 
+    if(!hex.startsWith('#')) return 'rgb(255, 255, 255)';
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgb(${r}, ${g}, ${b})`;
 }
+
+function convertRgbToHex(rgb) {
+    if (!rgb || rgb.startsWith('#')) return rgb || '#ffffff';
+    const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if (!match) return '#ffffff';
+    return "#" + ("0" + parseInt(match[1],10).toString(16)).slice(-2) +
+                ("0" + parseInt(match[2],10).toString(16)).slice(-2) +
+                ("0" + parseInt(match[3],10).toString(16)).slice(-2);
+}
+
+createGrid();
