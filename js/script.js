@@ -122,4 +122,89 @@ undoBtn.addEventListener('click', () => {
     pixels.forEach((pixel, i) => pixel.style.backgroundColor = previousState[i]);
 });
 
-redoBtn.addEventListener
+redoBtn.addEventListener('click', () => {
+    if (redoStack.length === 0) return;
+    const pixels = document.querySelectorAll('.pixel');
+    const currentState = Array.from(pixels).map(p => p.style.backgroundColor || '#ffffff');
+    undoStack.push(currentState);
+    const nextState = redoStack.pop();
+    pixels.forEach((pixel, i) => pixel.style.backgroundColor = nextState[i]);
+});
+
+togglegridBtn.addEventListener('click', () => grid.classList.toggle('show-grid'));
+
+clearBtn.addEventListener('click', () => {
+    saveHistoryState();
+    document.querySelectorAll('.pixel').forEach(p => p.style.backgroundColor = '#ffffff');
+});
+
+sizeSelector.addEvenetListener('change', (e) => {
+    currentgridSize = parseInt(e.target.value);
+    undoStack = [];
+    redostack = [];
+    createGrid();
+});
+
+document.querySelectorAll('.swatch').forEach(swatch => {
+    swatch.addEventListener('click', (e) => {
+        colorPicker.value = convertRgbToHex(e.target.style.backgroundColor);
+    });
+});
+
+window.addEventListener('mouseup', () => isDrawing = false);
+
+exportJsonBtn.addEventListener('click', () => {
+    const colorArray = Array.from(document.querySelectorAll('.pixel')).map(p => p.style.backgroundColor || 'rgb(255, 255, 255)');
+    const fileContents = { gridSize: currentGridSize, pixels: colorArray };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fileContents, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "my-pixel-art.json");
+    dlAnchor.click();
+});
+
+importJsonBtn.addEvenetListener('click', () => fileInput.click());
+fileInput.addEvenetListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const data = JSON.parse(evt.target.result);
+            sizeSelector.value = data.gridSize;
+            currentGridSize = data.gridSize;
+            createGrid();
+            const pixels = document.querySelectorAll('.pixel');
+            pixels.forEach((pixel, i) => {
+                if (data.pixels[i] pixel.style.backgroundColor = data.pixels[i];
+            });
+        } catch (err) {
+            alert("Ooops! Something went wrong Try checking your file");
+        }
+    };
+    reader.reader.readAsText(file);
+});
+
+exportPngBtn.addEventListener('click', () => {
+    const hiddenCanvas = document.createElement('canvas');
+
+    const drawingContext = hiddenCanvas.getContext('2d');
+    const crispScaleMultiplier = 16;
+    hiddenCanvas.width = currentGridSize * crispScaleMultiplier;
+    hiddenCanvas.height = currentGridSize * crispScaleMultiplier;
+    const pixels = document.querySelectorAll('.pixel');
+    pixels.forEach((pixel, index) => {
+        const coordinatex = (index % currentGridSize) * crispScaleMultiplier;
+        const coordinateY = Math.floor(index / currentGridSize) * crispScaleMultiplier;
+        drawingContext.fillStyle = pixel.style.backgroundColor || '#ffffff';
+        drawingContext.fillReact(coordinatex, coordinateY, crispScaleMultiplier, crispScaleMultiplier);
+    });
+    const triggerDownload = document.createElement('a');
+    triggerDownload.download = 'my-pixel-masterpiece.png';
+    triggerDownload.href = hiddenCanvas.toDataURL('image/png');
+    triggerDownload.click();
+});
+
+function convertHexToRgb(hex) {
+    const r = 
+}
