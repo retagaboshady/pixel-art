@@ -1,89 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>My Pixel Art Studio</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link href="css/style.css" rel="stylesheet">
 </head>
+
 <body class="dark-theme">
     <div class="app-container">
         
         <div class="sidebar">
-            <h2>Your Tools</h2>
-            <div class="tool-group">
-                <input type="color" id="colorPicker" value="#e74c3c">
-                <span class="tool-label">Brush Color</span>
-            </div>
+            <section>
+                <h2>Your Tools</h2>
+                <div class="tool-group">
+                    <input value="#e74c3c" type="color" id="colorPicker">
+                    <span class="tool-label">Brush Color</span>
+                </div>
+                
+                <div class="button-grid">
+                    <button class="active" id="drawTool">✏️ Paintbrush</button>
+                    <button id="eraseTool">🧽 Eraser</button>
+                    <button id="fillTool">🪣 Paint Bucket</button>
+                    <button id="pickerTool">🧪 Color Eyedropper</button>
+                </div>
+            </section>
             
-            <div class="button-grid">
-                <button id="drawTool" class="active">✏️ Paintbrush</button>
-                <button id="eraseTool">🧽 Eraser</button>
-                <button id="fillTool">🪣 Paint Bucket</button>
-                <button id="pickerTool">🧪 Color Eyedropper</button>
-            </div>
+            <hr/>
             
-            <hr>
+            <section>
+                <h2>Canvas Settings</h2>
+                <div class="select-group">
+                    <label for="sizeSelector">Grid Size:</label>
+                    <select id="sizeSelector">
+                        <option value="16">16 x 16 (Simple & Quick)</option>
+                        <option selected="selected" value="32">32 x 32 (Perfect Balance)</option>
+                        <option value="64">64 x 64 (Detailed Masterpiece)</option>
+                    </select>
+                </div>
+                <button id="toggleGrid">🌐 Hide/Show Gridlines</button>
+                <button id="clearBtn" class="danger">🗑️ Wipe Canvas Clean</button>
+            </section>
             
-            <h2>Canvas Settings</h2>
-            <div class="select-group">
-                <label for="sizeSelector">Grid Size:</label>
-                <select id="sizeSelector">
-                    <option value="16">16 x 16 (Simple & Quick)</option>
-                    <option value="32" selected>32 x 32 (Perfect Balance)</option>
-                    <option value="64">64 x 64 (Detailed Masterpiece)</option>
-                </select>
-            </div>
-            <button id="toggleGrid">🌐 Hide/Show Gridlines</button>
-            <button id="clearBtn" class="danger">🗑️ Wipe Canvas Clean</button>
+            <hr />
             
-            <hr>
+            <section>
+                <h2>Mistakes happen...</h2>
+                <div class="button-grid">
+                    <button id="undoBtn">↩️ Undo last move</button>
+                    <button id="redoBtn">↪️ Redo action</button>
+                </div>
+            </section>
             
-            <h2>Mistakes happen...</h2>
-            <div class="button-grid">
-                <button id="undoBtn">↩️ Undo last move</button>
-                <button id="redoBtn">↪️ Redo action</button>
-            </div>
+            <hr/>
             
-            <hr>
+            <section>
+                <h2>Save & Share</h2>
+                <button id="exportPngBtn" class="success">🖼️ Download as PNG Image</button>
+                <button id="exportJsonBtn">💾 Save Project File (JSON)</button>
+                <button id="importJsonBtn">📂 Load Old Project (JSON)</button>
+                <input id="fileInput" type="file" accept=".json" style="display:none">
+            </section>
             
-            <h2>Save & Share</h2>
-            <button id="exportPngBtn" class="success">🖼️ Download as PNG Image</button>
-            <button id="exportJsonBtn">💾 Save Project File (JSON)</button>
-            <button id="importJsonBtn">📂 Load Old Project (JSON)</button>
-            <input type="file" id="fileInput" accept=".json" style="display: none;">
-            
-            <hr>
-            
+            <hr />
             <button id="themeToggle">🌓 Switch Light/Dark Mode</button>
         </div>
 
         <div class="workspace">
-            <div class="palette-bar">
+            <header class="palette-bar">
                 <div class="palette-group">
                     <span>Classic Retro:</span>
-                    <div class="swatch" style="background: #000000;" title="Black"></div>
-                    <div class="swatch" style="background: #ffffff;" title="White"></div>
-                    <div class="swatch" style="background: #ff0000;" title="Red"></div>
-                    <div class="swatch" style="background: #0000ff;" title="Blue"></div>
-                    <div class="swatch" style="background: #00ff00;" title="Green"></div>
-                    <div class="swatch" style="background: #ffff00;" title="Yellow"></div>
+                    <div style="background:#000" class="swatch" title="Black"></div>
+                    <div style="background:#fff" class="swatch" title="White"></div>
+                    <div style="background:#ff0000" class="swatch" title="Red"></div>
+                    <div style="background:#0000ff" class="swatch" title="Blue"></div>
+                    <div style="background:#00ff00" class="swatch" title="Green"></div>
+                    <div style="background:#ffff00" class="swatch" title="Yellow"></div>
                 </div>
+                
                 <div class="palette-group">
                     <span>Nostalgic GameBoy:</span>
-                    <div class="swatch" style="background: #0f380f;" title="Darkest Green"></div>
-                    <div class="swatch" style="background: #306230;" title="Dark Green"></div>
-                    <div class="swatch" style="background: #8bac0f;" title="Light Green"></div>
-                    <div class="swatch" style="background: #9bbc0f;" title="Lightest Green"></div>
+                    <div style="background:#0f380f" class="swatch" title="Darkest Green"></div>
+                    <div style="background:#306230" class="swatch" title="Dark Green"></div>
+                    <div style="background:#8bac0f" class="swatch" title="Light Green"></div>
+                    <div style="background:#9bbc0f" class="swatch" title="Lightest Green"></div>
                 </div>
-            </div>
+            </header>
             
-            <div class="canvas-wrapper">
-                <div id="pixelGrid" class="grid show-grid"></div>
-            </div>
+            <main class="canvas-wrapper">
+                <div class="grid show-grid" id="pixelGrid"></div>
+            </main>
         </div>
 
     </div>
+
     <script src="js/script.js"></script>
 </body>
 </html>
